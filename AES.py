@@ -1,6 +1,9 @@
 from tools.Tools import getRounds
 from functions.Cipher import Cipher
 from functions.KeyExpansions import KeyExpansion
+from tools.datatypes.Byte import Byte
+from tools.conversion import Converter
+import sys
 
 
 # noinspection PyTypeChecker
@@ -18,7 +21,7 @@ class AES:
         self.Nr = getRounds(self.Nk, self.Nb)
         self.key = None
         self.plaintext = None
-        self.ciphertext = None
+        self.ciphertext = []
 
         self.cipher = None
         self.keyschedule = None
@@ -32,11 +35,38 @@ class AES:
     def getCiphertext(self):
         return self.ciphertext
 
-    def setKey(self, key):
-        self.key = key
+    def setKey(self, **kwargs):
+        for kw in kwargs:
+            if kw == "hex":
+                bits = Converter.hexToBin(kwargs[kw])
+                key = Converter.binToBytearray(bits)
+                break
+            elif kw == "bytes":
+                key = kwargs[kw]
+                break
+            else:
+                raise ValueError(kw + " is no supported key type.")
 
-    def setPlaintext(self, text):
-        self.plaintext = text
+        if len(key) not in (16, 24, 32):
+            raise ValueError(str(len(key)) + " is no supported key length")
+        self.key = key
+        self.Nk = int(len(key)/4)
+
+    def setPlaintext(self, **kwargs):
+        for kw in kwargs:
+            if kw == "text":
+                pass
+            elif kw == "file":
+                pass
+            elif kw == "bytes":
+                self.plaintext = kwargs[kw]
+                break
+            elif kw == "hex":
+                bits = Converter.hexToBin(kwargs[kw])
+                self.plaintext = Converter.binToBytearray(bits)
+                break
+            else:
+                raise ValueError(kw + " is no accepted input type.")
 
     def setCiphertext(self, text):
         self.ciphertext = text
@@ -46,9 +76,29 @@ class AES:
             raise AttributeError("Missing key or plaintext.")
 
         self.keyschedule = KeyExpansion(self.key, self.Nk, self.Nb).run()
-        self.cipher = Cipher(self.plaintext, self.keyschedule, self.Nr)
+        self.cipher = Cipher(self.keyschedule, self.Nr)
 
-        self.ciphertext = self.cipher.run()
+        if len(self.plaintext) % 16 != 0:
+            for i in range(len(self.plaintext) % 16):
+                self.plaintext.append(Byte())
+
+        for i in range(0, len(self.plaintext), 16):
+            inp = self.plaintext[i:i+16]
+            self.ciphertext += self.cipher.encrypt(inp)
 
     def decrypt(self):
         pass
+
+
+if __name__ == '__main__':
+    args = sys.argv
+    inp = args[1]
+    key = args[2]
+    c = AES(int(len(key)/8))
+    c.setKey(hex=key)
+    c.setPlaintext(hex=inp)
+    c.encrypt()
+    out = c.getCiphertext()
+    for b in out:
+        print(b, end='')
+    print("\n")

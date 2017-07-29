@@ -57,8 +57,8 @@ class KeyExpansion:
         new_word = Word()
 
         for i in range(4):
-            x = hexToInt[str(word[i])[1]]
-            y = hexToInt[str(word[i])[2]]
+            x = hexToInt(str(word[i])[1])
+            y = hexToInt(str(word[i])[2])
             new_word[i] = Byte(self.sbox[x][2 * y: 2 * y + 2])
         return new_word
 

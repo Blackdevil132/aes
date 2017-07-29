@@ -1,7 +1,7 @@
 from functions.KeyExpansions import KeyExpansion
 from tools.Tools import shift
 from tools.SBox import SBox
-from tools.conversion.Converter import bitseqToBytearray, hexseqToBitseq, hexToInt, bytearrayToState, stateToBytearray
+from tools.conversion.Converter import binToBytearray, hexToBin, hexToInt, bytearrayToState, stateToBytearray
 from tools.datatypes.Byte import Byte
 from tools.datatypes.State import State
 from tools.datatypes.Word import Word
@@ -9,7 +9,7 @@ from tools.datatypes.Word import Word
 
 # noinspection PyPep8Naming
 class Cipher:
-    def __init__(self, input, w, Nr, Nb=4):
+    def __init__(self, w, Nr, Nb=4):
         """
         
         Nb is fixed to 4 for the AES algorithm
@@ -17,24 +17,23 @@ class Cipher:
         State s is transformed in Nr rounds, with the final round differing from the first Nr-1 rounds
         Final state is then copied to the output
 
-        :type input: [Byte]
         :type w: [Word]
-        :param input: 128 bit block (16 Byte)
         :param w: Key schedule
         """
-        self.input = input
-        self.output = 0
+        self.output = None
         self.w = w
         self.Nb = Nb
         self.Nr = Nr
-        self.state = bytearrayToState(input)
+        self.state = None
         self.sbox = SBox()
 
-    def run(self):
+    def encrypt(self, inp):
         """
         :rtype: [Byte]
 
         """
+
+        self.state = bytearrayToState(inp)
 
         self.AddRoundKey(0)
 
@@ -69,8 +68,8 @@ class Cipher:
         new_state = State()
         for c in range(self.Nb):
             for r in range(4):
-                x = hexToInt[str(self.state[r][c])[1]]
-                y = hexToInt[str(self.state[r][c])[2]]
+                x = hexToInt(str(self.state[r][c])[1])
+                y = hexToInt(str(self.state[r][c])[2])
 
                 new_state[r][c] = Byte(self.sbox[x][2 * y: 2 * y + 2])
 

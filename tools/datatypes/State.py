@@ -16,6 +16,16 @@ class State:
     def __setitem__(self, key, value):
         self.matrix[key] = value
 
+    def __eq__(self, other):
+        if type(other) != State:
+            raise TypeError(type(other) + " can not be compared with State.")
+        ret = True
+        for r in range(4):
+            for c in range(self.Nb):
+                ret &= (self.matrix[r][c] == other.matrix[r][c])
+        return ret
+
+
     def __str__(self):
         s = ''
         for r in range(4):
