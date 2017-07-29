@@ -3,8 +3,16 @@ from functions.Cipher import Cipher
 from functions.KeyExpansions import KeyExpansion
 
 
-class AES():
+# noinspection PyTypeChecker
+class AES:
     def __init__(self, Nk):
+        """
+
+        :type Nk: int
+        :param Nk: key length in number of words. allowed values are 4, 6 and 8
+        """
+        if Nk not in (4, 6, 8):
+            raise ValueError(str(Nk) + " is no supported key length.")
         self.Nk = Nk
         self.Nb = 4
         self.Nr = getRounds(self.Nk, self.Nb)
