@@ -102,6 +102,11 @@ class Byte():
 
         return new
 
+    def __eq__(self, other):
+        if type(other) == Byte:
+            return self.__index__() == other.__index__()
+        else:
+            raise TypeError("can't compare Byte with " + type(other))
 
 """
 a = Byte('f0')

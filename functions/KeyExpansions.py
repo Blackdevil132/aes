@@ -1,14 +1,25 @@
-from tools.Word import Word
-from tools.Byte import Byte
-from tools.Tools import initiateSbox, hexToInt, bitSeqToByteArray, hexSeqToBitSeq
+from tools.conversion.Converter import hexToInt
+from tools.SBox import SBox
+from tools.Tools import getRounds
+from tools.datatypes.Byte import Byte
+from tools.datatypes.Word import Word
 
 
 class KeyExpansion:
     def __init__(self, key, Nk, Nb=4):
+        """
+
+        :type key: [Byte]
+        :type Nk: int
+        :type Nb: int
+        :param key: the cipherkey in form of a Bytearray of length 4*Nk
+        :param Nk: keylength in words; possible values 4, 6 and 8
+        :param Nb: blocklength in words; fixes to 4 for AES
+        """
         self.key = key
         self.Nk = Nk
         self.Nb = Nb
-        self.Nr = 10
+        self.Nr = getRounds(Nk, Nb)
 
         self.Rcon = []
         for i in range(int((self.Nb * (self.Nr + 1))/self.Nk)):
@@ -18,10 +29,15 @@ class KeyExpansion:
 
             self.Rcon.append(Word(h))
 
-        self.sbox = initiateSbox()
+        self.sbox = SBox()
 
     def run(self):
-        #temp = Word()
+        """
+        calculate the key schedule for the specified parameters
+
+        :rtype: [Word]
+        :return: Keyschedule for keylength Nk and blocklength Nb
+        """
         w = [Word() for i in range(self.Nb * (self.Nr + 1))]
 
         for i in range(self.Nk):
@@ -50,6 +66,7 @@ class KeyExpansion:
         a = Word('00000001')
         ret = word * a
         return ret
+
 
 """
 k = '2b7e151628aed2a6abf7158809cf4f3c'

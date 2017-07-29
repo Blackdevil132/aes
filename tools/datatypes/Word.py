@@ -1,4 +1,4 @@
-from tools.Byte import Byte
+from tools.datatypes.Byte import Byte
 
 
 # noinspection PyTypeChecker

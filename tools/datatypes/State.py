@@ -1,5 +1,4 @@
-from tools.Word import Word
-from tools.Byte import Byte
+from tools.datatypes.Byte import Byte
 
 
 class State:
