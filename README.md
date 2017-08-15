@@ -17,5 +17,5 @@ This means files will be encrypted with the Rijndael algorithm. Block length is 
 #### Arguments  
 `-h, --help` _show this help message and exit_  
 `-k KEY, --key KEY` _Key in textform of length 16, 24 or 32 Symbols_  
-`-i INPUT, --input INPUT` _Path to file which should be encrypted or decrypted_  
+`-i INPUT, --input INPUT` _Relative path to file_  
 `-d` _set this flag if you want to decrypt the file_  
