@@ -1,9 +1,9 @@
 class SBox:
     def __init__(self, inverse=False):
         if inverse:
-            self.PATH_SBOX = "InvSBox.txt"
+            self.PATH_SBOX = "tools\\sbox\\InvSBox.txt"
         else:
-            self.PATH_SBOX = "SBox.txt"
+            self.PATH_SBOX = "tools\\sbox\\SBox.txt"
 
         self.box = self.initiate()
 

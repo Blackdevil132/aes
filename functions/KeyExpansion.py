@@ -1,8 +1,8 @@
-from tools.conversion.Converter import hexToInt
-from tools.SBox import SBox
 from tools.Tools import getRounds
+from tools.conversion.Converter import hexToInt
 from tools.datatypes.Byte import Byte
 from tools.datatypes.Word import Word
+from tools.sbox.SBox import SBox
 
 
 class KeyExpansion:

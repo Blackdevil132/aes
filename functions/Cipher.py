@@ -1,10 +1,9 @@
-from functions.KeyExpansion import KeyExpansion
 from tools.Tools import shift
-from tools.SBox import SBox
-from tools.conversion.Converter import binToBytearray, hexToBin, hexToInt, bytearrayToState, stateToBytearray
+from tools.conversion.Converter import hexToInt, bytearrayToState, stateToBytearray
 from tools.datatypes.Byte import Byte
 from tools.datatypes.State import State
 from tools.datatypes.Word import Word
+from tools.sbox.SBox import SBox
 
 
 # noinspection PyPep8Naming
