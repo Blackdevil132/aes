@@ -18,11 +18,11 @@ Further goals are to translate the algorithm into Java and ultimately to create 
     AES.py [-h] -k KEY -i INPUT [-d]  
 
 #### Arguments  
-`-h, --help`
+`-h, --help`  
 show this help message and exit  
-`-k KEY, --key KEY`
+`-k KEY, --key KEY`  
 Key in textform of length 16, 24 or 32 Symbols  
-`-i INPUT, --input INPUT`
+`-i INPUT, --input INPUT`  
 Path to file which should be encrypted or decrypted  
-`-d`
+`-d`  
 set this flag if you want to decrypt the file  
