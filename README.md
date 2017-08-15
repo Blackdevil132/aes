@@ -3,7 +3,7 @@
 ## Description  
 
 The Goal of this project is to provide an easy-to-use tool for encrypting and decrypting files using the AES-Algorithm.  
-The algorithm follows the official [specification](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf) of AES  
+The algorithm follows the official [specification of AES](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf)  
 
 This means files will be encrypted with the Rijndael algorithm, a symmetric block cipher. Block length is 128 bits. Supported key lengths are 128, 192 and 256 bits.  
 
