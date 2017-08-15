@@ -23,6 +23,12 @@ class TestConverter_advanced(unittest.TestCase):
         self.assertSequenceEqual(bytearrayToHex(self.ba), self.hex)
         self.assertEqual(bytearrayToHex(hexToBytearray(self.hex)), self.hex)
 
+    def test_hex_and_text_conv(self):
+        self.assertEqual(hexToText("68616c6c6f"), "hallo")
+        self.assertEqual(hexToText("2122a72425262f2829"), '!"§$%&/()')
+        self.assertEqual(textToHex("hallo"), "68616c6c6f")
+        self.assertEqual(textToHex('!"§$%&/()'), "2122a72425262f2829")
+
 
 if __name__ == '__main__':
     unittest.main()

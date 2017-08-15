@@ -168,7 +168,14 @@ def textToHex(text: str) -> str:
 
 
 def hexToText(hex: str) -> str:
-    pass
+    text = ""
+    for i in range(0, len(hex), 2):
+        h = hex[i:i+2]
+        #print("h: %s" % h, end='')
+        c = chr(hexToInt(h))
+        #print(" -> c: %s\n" % c)
+        text += c
+    return text
 
 
 def bytearrayToText(ba: Sequence[Byte]) -> str:

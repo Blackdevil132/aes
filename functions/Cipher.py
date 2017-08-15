@@ -1,4 +1,4 @@
-from functions.KeyExpansions import KeyExpansion
+from functions.KeyExpansion import KeyExpansion
 from tools.Tools import shift
 from tools.SBox import SBox
 from tools.conversion.Converter import binToBytearray, hexToBin, hexToInt, bytearrayToState, stateToBytearray
@@ -26,6 +26,7 @@ class Cipher:
         self.Nr = Nr
         self.state = None
         self.sbox = SBox()
+        self.invsbox = SBox(inverse=True)
 
     def encrypt(self, inp):
         """
@@ -88,13 +89,63 @@ class Cipher:
         new_state = State()
 
         for c in range(self.Nb):
-            new_state[0][c] = (Byte('02') * self.state[0][c]) + (Byte('03') * self.state[1][c]) + self.state[2][c] + \
-                              self.state[3][c]
-            new_state[1][c] = self.state[0][c] + (Byte('02') * self.state[1][c]) + (Byte('03') * self.state[2][c]) + \
-                              self.state[3][c]
-            new_state[2][c] = self.state[0][c] + self.state[1][c] + (Byte('02') * self.state[2][c]) + (
-            Byte('03') * self.state[3][c])
-            new_state[3][c] = (Byte('03') * self.state[0][c]) + self.state[1][c] + self.state[2][c] + (
-            Byte('02') * self.state[3][c])
+            new_state[0][c] = (Byte('02') * self.state[0][c])   + (Byte('03') * self.state[1][c])   + self.state[2][c]                  + self.state[3][c]
+            new_state[1][c] = self.state[0][c]                  + (Byte('02') * self.state[1][c])   + (Byte('03') * self.state[2][c])   + self.state[3][c]
+            new_state[2][c] = self.state[0][c]                  + self.state[1][c]                  + (Byte('02') * self.state[2][c])   + (Byte('03') * self.state[3][c])
+            new_state[3][c] = (Byte('03') * self.state[0][c])   + self.state[1][c]                  + self.state[2][c]                  + (Byte('02') * self.state[3][c])
 
         self.state = new_state
+
+    def InvShiftRows(self):
+        new_state = State()
+
+        for r in range(4):
+            for c in range(self.Nb):
+                new_state[r][(c + shift(r, self.Nb)) % self.Nb] = self.state[r][c]
+
+        self.state = new_state
+
+    def InvSubBytes(self):
+        new_state = State()
+        for c in range(self.Nb):
+            for r in range(4):
+                x = hexToInt(str(self.state[r][c])[1])
+                y = hexToInt(str(self.state[r][c])[2])
+
+                new_state[r][c] = Byte(self.invsbox[x][2 * y: 2 * y + 2])
+
+        self.state = new_state
+
+    def InvMixColumns(self):
+        new_state = State()
+
+        for c in range(self.Nb):
+            new_state[0][c] = (Byte('0e') * self.state[0][c])   + (Byte('0b') * self.state[1][c])   + (Byte('0d') * self.state[2][c])   + (Byte('09') * self.state[3][c])
+            new_state[1][c] = (Byte('09') * self.state[0][c])   + (Byte('0e') * self.state[1][c])   + (Byte('0b') * self.state[2][c])   + (Byte('0d') * self.state[3][c])
+            new_state[2][c] = (Byte('0d') * self.state[0][c])   + (Byte('09') * self.state[1][c])   + (Byte('0e') * self.state[2][c])   + (Byte('0b') * self.state[3][c])
+            new_state[3][c] = (Byte('0b') * self.state[0][c])   + (Byte('0d') * self.state[1][c])   + (Byte('09') * self.state[2][c])   + (Byte('0e') * self.state[3][c])
+
+        self.state = new_state
+
+    def decrypt(self, inp):
+        """
+        :rtype: [Byte]
+
+        """
+
+        self.state = bytearrayToState(inp)
+
+        self.AddRoundKey(self.Nr)
+
+        for i in range(self.Nr-1, 0, -1):
+            self.InvShiftRows()
+            self.InvSubBytes()
+            self.AddRoundKey(i)
+            self.InvMixColumns()
+
+        self.InvShiftRows()
+        self.InvSubBytes()
+        self.AddRoundKey(0)
+
+        self.output = stateToBytearray(self.state)
+        return self.output

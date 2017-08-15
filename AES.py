@@ -1,6 +1,6 @@
 from tools.Tools import getRounds
 from functions.Cipher import Cipher
-from functions.KeyExpansions import KeyExpansion
+from functions.KeyExpansion import KeyExpansion
 from tools.datatypes.Byte import Byte
 from tools.conversion import Converter
 import sys
@@ -26,20 +26,55 @@ class AES:
         self.cipher = None
         self.keyschedule = None
 
-    def getKey(self):
-        return self.key
+    def getKey(self, t: str="hex", filename="key.txt") -> str:
+        if t == "hex":
+            return Converter.bytearrayToHex(self.key)
+        elif t == "text":
+            return Converter.bytearrayToText(self.key)
+        elif t == "file":
+            text = Converter.bytearrayToText(self.key)
+            file = open(filename, 'w', encoding="utf8")
+            file.write(text)
+            file.close()
+            return filename
 
-    def getPlaintext(self):
-        return self.plaintext
+    def getPlaintext(self, t: str="hex", filename="decrypted.txt") -> str:
+        if t == "hex":
+            return Converter.bytearrayToHex(self.plaintext)
+        elif t == "text":
+            return Converter.bytearrayToText(self.plaintext)
+        elif t == "file":
+            text = Converter.bytearrayToText(self.plaintext)
+            file = open(filename, 'w', encoding="utf8")
+            file.write(text)
+            file.close()
+            return filename
 
-    def getCiphertext(self):
-        return self.ciphertext
+    def getCiphertext(self, t: str="hex", filename="encrypted.txt") -> str:
+        if t == "hex":
+            return Converter.bytearrayToHex(self.ciphertext)
+        elif t == "text":
+            return Converter.bytearrayToText(self.ciphertext)
+        elif t == "file":
+            text = Converter.bytearrayToText(self.ciphertext)
+            file = open(filename, 'w', encoding="utf8")
+            file.write(text)
+            file.close()
+            return filename
 
     def setKey(self, **kwargs):
         for kw in kwargs:
-            if kw == "hex":
-                bits = Converter.hexToBin(kwargs[kw])
-                key = Converter.binToBytearray(bits)
+            if kw == "text":
+                key = Converter.textToBytearray(kwargs[kw])
+                break
+            elif kw == "file":
+                file = open(kwargs[kw], encoding="utf8")
+                text = file.read()
+                file.close()
+                key = Converter.textToBytearray(text)
+                break
+            elif kw == "hex":
+                key = Converter.hexToBytearray(kwargs[kw])
                 break
             elif kw == "bytes":
                 key = kwargs[kw]
@@ -55,31 +90,52 @@ class AES:
     def setPlaintext(self, **kwargs):
         for kw in kwargs:
             if kw == "text":
-                pass
+                self.plaintext = Converter.textToBytearray(kwargs[kw])
+                break
             elif kw == "file":
-                pass
+                file = open(kwargs[kw], encoding="utf8")
+                text = file.read()
+                file.close()
+                self.plaintext = Converter.textToBytearray(text)
+                break
             elif kw == "bytes":
                 self.plaintext = kwargs[kw]
                 break
             elif kw == "hex":
-                bits = Converter.hexToBin(kwargs[kw])
-                self.plaintext = Converter.binToBytearray(bits)
+                self.plaintext = Converter.hexToBytearray(kwargs[kw])
                 break
             else:
                 raise ValueError(kw + " is no accepted input type.")
 
-    def setCiphertext(self, text):
-        self.ciphertext = text
+    def setCiphertext(self, **kwargs):
+        for kw in kwargs:
+            if kw == "text":
+                self.ciphertext = Converter.textToBytearray(kwargs[kw])
+                break
+            elif kw == "file":
+                file = open(kwargs[kw], encoding="utf8")
+                text = file.read()
+                file.close()
+                self.ciphertext = Converter.textToBytearray(text)
+                break
+            elif kw == "bytes":
+                self.ciphertext = kwargs[kw]
+                break
+            elif kw == "hex":
+                self.ciphertext = Converter.hexToBytearray(kwargs[kw])
+                break
+            else:
+                raise ValueError(kw + " is no accepted input type.")
 
     def encrypt(self):
         if self.plaintext is None or self.key is None:
             raise AttributeError("Missing key or plaintext.")
 
+        self.ciphertext = []
         self.keyschedule = KeyExpansion(self.key, self.Nk, self.Nb).run()
         self.cipher = Cipher(self.keyschedule, self.Nr)
-
         if len(self.plaintext) % 16 != 0:
-            for i in range(len(self.plaintext) % 16):
+            for i in range(16 - len(self.plaintext) % 16):
                 self.plaintext.append(Byte())
 
         for i in range(0, len(self.plaintext), 16):
@@ -87,7 +143,20 @@ class AES:
             self.ciphertext += self.cipher.encrypt(inp)
 
     def decrypt(self):
-        pass
+        if self.ciphertext is None or self.key is None:
+            raise AttributeError("Missing key or ciphertext.")
+
+        self.plaintext = []
+        self.keyschedule = KeyExpansion(self.key, self.Nk, self.Nb).run()
+        cipher = Cipher(self.keyschedule, self.Nr)
+
+        if len(self.ciphertext) % 16 != 0:
+            for i in range(16 - len(self.ciphertext) % 16):
+                self.ciphertext.append(Byte())
+
+        for i in range(0, len(self.ciphertext), 16):
+            inp = self.ciphertext[i:i+16]
+            self.plaintext += cipher.decrypt(inp)
 
 
 if __name__ == '__main__':
@@ -96,9 +165,7 @@ if __name__ == '__main__':
     key = args[2]
     c = AES(int(len(key)/8))
     c.setKey(hex=key)
-    c.setPlaintext(hex=inp)
+    c.setPlaintext(file=inp)
     c.encrypt()
-    out = c.getCiphertext()
-    for b in out:
-        print(b, end='')
-    print("\n")
+    out = c.getCiphertext("file")
+    print(out)
