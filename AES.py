@@ -1,3 +1,5 @@
+import argparse
+
 from tools.Tools import getRounds
 from functions.Cipher import Cipher
 from functions.KeyExpansion import KeyExpansion
@@ -32,7 +34,7 @@ class AES:
         elif t == "text":
             return Converter.bytearrayToText(self.key)
         elif t == "file":
-            text = Converter.bytearrayToText(self.key)
+            text = Converter.bytearrayToHex(self.key)
             file = open(filename, 'w', encoding="utf8")
             file.write(text)
             file.close()
@@ -56,7 +58,7 @@ class AES:
         elif t == "text":
             return Converter.bytearrayToText(self.ciphertext)
         elif t == "file":
-            text = Converter.bytearrayToText(self.ciphertext)
+            text = Converter.bytearrayToHex(self.ciphertext)
             file = open(filename, 'w', encoding="utf8")
             file.write(text)
             file.close()
@@ -71,7 +73,7 @@ class AES:
                 file = open(kwargs[kw], encoding="utf8")
                 text = file.read()
                 file.close()
-                key = Converter.textToBytearray(text)
+                key = Converter.hexToBytearray(text)
                 break
             elif kw == "hex":
                 key = Converter.hexToBytearray(kwargs[kw])
@@ -116,7 +118,7 @@ class AES:
                 file = open(kwargs[kw], encoding="utf8")
                 text = file.read()
                 file.close()
-                self.ciphertext = Converter.textToBytearray(text)
+                self.ciphertext = Converter.hexToBytearray(text)
                 break
             elif kw == "bytes":
                 self.ciphertext = kwargs[kw]
@@ -160,12 +162,27 @@ class AES:
 
 
 if __name__ == '__main__':
-    args = sys.argv
-    inp = args[1]
-    key = args[2]
-    c = AES(int(len(key)/8))
-    c.setKey(hex=key)
-    c.setPlaintext(file=inp)
-    c.encrypt()
-    out = c.getCiphertext("file")
-    print(out)
+    parser = argparse.ArgumentParser(description="Encrypt and decrypt files with AES.")
+
+    parser.add_argument('-k', '--key', required=True, help="Key in textform of length 16, 24 or 32 Symbols")
+    parser.add_argument("-i", "--input", required=True, help="Path to file which should be encrypted or decrypted")
+    parser.add_argument("-d", action='store_true', help="set this flag if you want to decrypt the file")
+    args = parser.parse_args()
+
+    keylength = int(len(args.key)/4)
+    aes = AES(keylength)
+    aes.setKey(text=args.key)
+    if not args.d:
+        file = args.input.split(".")
+        name = file[0] + "_encrypted." + file[1]
+        aes.setPlaintext(file=args.input)
+        aes.encrypt()
+        aes.getCiphertext("file", name)
+        print("File encrypted and stored in: " + name)
+    else:
+        file = args.input.split(".")
+        name = file[0] + "_decrypted." + file[1]
+        aes.setCiphertext(file=args.input)
+        aes.decrypt()
+        aes.getPlaintext("file", name)
+        print("File decrypted and stored in: " + name)
