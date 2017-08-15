@@ -18,8 +18,8 @@ no additional libraries are needed
     AES.py [-h] -k KEY -i INPUT [-d]  
 
 arguments:  
-    -h, --help            show this help message and exit  
-    -k KEY, --key KEY     Key in textform of length 16, 24 or 32 Symbols  
+    -h, --help            \t show this help message and exit  
+    -k KEY, --key KEY     \t Key in textform of length 16, 24 or 32 Symbols  
     -i INPUT, --input INPUT  
-                        Path to file which should be encrypted or decrypted  
-    -d                    set this flag if you want to decrypt the file  
+                        \t Path to file which should be encrypted or decrypted  
+    -d                    \t set this flag if you want to decrypt the file  
