@@ -172,7 +172,7 @@ if __name__ == '__main__':
     keylength = int(len(args.key)/4)
     aes = AES(keylength)
     aes.setKey(text=args.key)
-        if not args.d:
+    if not args.d:
         file = args.input.split(".")
         name = file[0] + "." + file[1] + ".enc"
         aes.setPlaintext(file=args.input)
@@ -183,8 +183,16 @@ if __name__ == '__main__':
     else:
         file = args.input.split(".")
         name = file[0] + "." + file[1]
-        aes.setCiphertext(file=args.input)
+
+        if os.path.isfile(args.input):
+            f = args.input
+        elif os.path.isfile(args.input + ".enc"):
+            f = args.input + ".enc"
+        else:
+            raise FileNotFoundError("File" + args.input + "does not exist!")
+
+        aes.setCiphertext(file=f)
         aes.decrypt()
+        os.remove(f)
         aes.getPlaintext("file", name)
-        os.remove(args.input)
         print("File decrypted and stored in: " + name)
