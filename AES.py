@@ -5,7 +5,7 @@ from functions.Cipher import Cipher
 from functions.KeyExpansion import KeyExpansion
 from tools.datatypes.Byte import Byte
 from tools.conversion import Converter
-import sys
+import os
 
 
 # noinspection PyTypeChecker
@@ -172,17 +172,19 @@ if __name__ == '__main__':
     keylength = int(len(args.key)/4)
     aes = AES(keylength)
     aes.setKey(text=args.key)
-    if not args.d:
+        if not args.d:
         file = args.input.split(".")
-        name = file[0] + "_encrypted." + file[1]
+        name = file[0] + "." + file[1] + ".enc"
         aes.setPlaintext(file=args.input)
         aes.encrypt()
         aes.getCiphertext("file", name)
+        os.remove(args.input)
         print("File encrypted and stored in: " + name)
     else:
         file = args.input.split(".")
-        name = file[0] + "_decrypted." + file[1]
+        name = file[0] + "." + file[1]
         aes.setCiphertext(file=args.input)
         aes.decrypt()
         aes.getPlaintext("file", name)
+        os.remove(args.input)
         print("File decrypted and stored in: " + name)
