@@ -1,9 +1,13 @@
+import os
+
+
 class SBox:
     def __init__(self, inverse=False):
+        PATH = os.path.dirname(os.path.realpath(__file__))
         if inverse:
-            self.PATH_SBOX = "tools\\sbox\\InvSBox.txt"
+            self.PATH_SBOX = PATH + "/InvSBox.txt"
         else:
-            self.PATH_SBOX = "tools\\sbox\\SBox.txt"
+            self.PATH_SBOX = PATH + "/SBox.txt"
 
         self.box = self.initiate()
 
